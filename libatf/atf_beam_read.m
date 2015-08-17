@@ -33,7 +33,7 @@ blkSize = (nSamp * 11) + ...    % estimate number of bytes for data heap
     (nSamp/8) * 2;              % count end of line carriage returns
 datSize = nCh * (16 + blkSize);   % count Channel header line
 
-
+q
 %% read first record to determine header/footer sizes
 fprintf('Reading %d samples on %d channels\n',nSamp,nCh)
 
@@ -47,8 +47,8 @@ nRec = (fInfo.bytes - hdrSize)/recSize;
 fprintf('Found %g records in file\n', nRec)
 
 % preallocate data vectors
-[ts(1:nCh).data] = deal(nan(nSamp,1));
-[ts(1:nCh).fs] = deal(nan);
+[ts(2:nCh).data] = deal(nan(nSamp,1));
+[ts(2:nCh).fs] = deal(nan);
 [rec(1:nRec).ts] = deal(ts);
 [rec(1:nRec).angle] = deal(nan);
 
