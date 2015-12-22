@@ -54,7 +54,7 @@ for fnum=1:nfiles
     fprintf('[%d] Converting file: %s\n', fnum, fname_mat);
     
     % read beam pattern time series file (ASCII formatted)
-    rec = atf_beam_read(fname);
+    rec = atfReadRecord(fname);
     
     % save data to file
     save([fname '.mat'], 'rec')

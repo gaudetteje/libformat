@@ -1,12 +1,18 @@
-function rec = atf_beam_read(fname,varargin)
+function rec = atfReadRecord(fname,varargin)
 
 fclose('all');   % cleanup from previous debugging
 
 global nCh
 global nSamp
 
+nCh = [];
+nSamp = [];
+
 fInfo = dir(fname);
 fid = fopen(fname,'r');
+if fid < 0
+    error(sprintf('Unable to open file "%s"',fname))
+end
 
 % read in formatted header data
 hdr = textscan(fid, '%s', 6, 'Delimiter', '\n');
@@ -24,16 +30,29 @@ res = textscan(hdr{1}{3},'%s%n','delimiter',':');
 nCh = res{2};
 
 % 4-6 rows - record size (just use ch1 for now)
-res = textscan(hdr{1}{4},'%s%n','delimiter',':');
-nSamp = res{2};
+for n=1:nCh
+    % handle special case for n==4 differently
+    if nCh < 4 || (nCh == 4 && n < 3)
+        res = textscan(hdr{1}{3+n},'%s%n','delimiter',':');
+        nSamp(n) = res{2};
+    elseif nCh == 4 && n == 3
+        res = textscan(hdr{1}{6},'%s%n%s%n','delimiter',':');
+        nSamp(3) = res{2};
+        nSamp(4) = res{4};
+        break
+    else
+        error('Channels exceed 4; not sure how to parse text header')
+    end
+end
 
 % estimate number of records
 hdrSize = ftell(fid);           % get position at start of data records
-blkSize = (nSamp * 11) + ...    % estimate number of bytes for data heap
-    (nSamp/8) * 2;              % count end of line carriage returns
-datSize = nCh * (16 + blkSize);   % count Channel header line
+for n = 1:nCh
+    blkSize(n) = (nSamp(n) * 11) + ...    % estimate number of bytes for data heap
+        (nSamp(n)/8) * 2;              % count end of line carriage returns
+end
+datSize = (nCh * 16) + sum(blkSize);   % count Channel header line
 
-q
 %% read first record to determine header/footer sizes
 fprintf('Reading %d samples on %d channels\n',nSamp,nCh)
 
@@ -47,11 +66,12 @@ nRec = (fInfo.bytes - hdrSize)/recSize;
 fprintf('Found %g records in file\n', nRec)
 
 % preallocate data vectors
-[ts(2:nCh).data] = deal(nan(nSamp,1));
-[ts(2:nCh).fs] = deal(nan);
-[rec(1:nRec).ts] = deal(ts);
-[rec(1:nRec).angle] = deal(nan);
-
+if nRec > 1
+    [ts(2:nCh).data] = deal(nan(max(nSamp),1));
+    [ts(2:nCh).fs] = deal(nan);
+    [rec(2:nRec).ts] = deal(ts);
+    [rec(2:nRec).angle] = deal(nan);
+end
 
 %% now iterate over each record
 for m=2:nRec
@@ -73,7 +93,7 @@ global nSamp
     for n = 1:nCh
 %        res = textscan(fid, '%s', 1, 'delimiter', '\n');
         fmt = '%n';
-        dat = textscan(fid, fmt, nSamp, ...
+        dat = textscan(fid, fmt, nSamp(n), ...
             'HeaderLines', 1);      % just skip over "CHANNEL X DATA"
 
         % advance to next line (textscan ignores the last carriage return)
