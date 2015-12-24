@@ -34,7 +34,7 @@ end
 if ischar(src)
     % if path entered, locate all files in specified path
     if exist(src,'dir')
-        src = findfiles(src,'\.(av)bin$');
+        src = findfiles(src,'\.(av)?bin$');
     % if filename entered, verify it exists
     elseif exist(src,'file')
         src = {src};
@@ -47,6 +47,12 @@ if ischar(src)
     end
 end
 
+% bail out if nothing is found
+if isempty(src)
+    error('No files were found')
+end
+
+% specify a destination
 if ischar(dst)
     if exist(dst,'dir')
         dst = repmat({dst},numel(src),1);
