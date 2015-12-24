@@ -54,33 +54,55 @@ for f = 1:numel(src)
         continue
     end
     
-    % determine channel count based on extension
+    % determine channel count and sampling rates based on extension
     [pname,fname,ext] = fileparts(srcname);
     switch ext
         case '.bin'
+            % try to gather stats from info file
             infofile = fullfile(pname,'ExpInfo.mat');
             if exist(infofile,'file')
-                % try to get number of trials from info file
-                load infofile
-                if isfield(ExpInfo,'nTrials')
+                load(infofile)
+                
+                % try to extract number of trials
+                if strcmp(fname(end-5:end),'trials') 
+                    isfield(ExpInfo,'nTrials')
                     nchan = ExpInfo.nTrials;
                 else
                     nchan = 1;
                 end
+                
+                % try to extract sampling rate
+                if strcmp(fname(end-2:end),'avg') || strcmp(fname(end-4:end),'trials')
+                    if isfield(ExpInfo,'aiRate')
+                        fs = ExpInfo.aiRate;
+                    else
+                        fs = 1;
+                    end
+                elseif strcmp(fname(end-3:end),'stim')
+                    if isfield(ExpInfo,'aoRate')
+                        fs = ExpInfo.aoRate;
+                    else
+                        fs = 1;
+                    end
+                end
+                
+            % default to 1 channel
             else
-                % default to 1 channel
                 nchan = 1;
+                fs = 1;
             end
         case '.avbin'
             nchan = 2;
+            fs = 5e5;
         otherwise
             warning('Unknown number of channels in data; Assuming 1 channel')
             nchan = 1;
+            fs = 1;
     end
     
     % convert the data file
     fprintf('Converting "%s"...',srcname);
-    bin_to_mat(srcname,nchan);
+    bin_to_mat(srcname,nchan,fs);
     fprintf('  Done!\n');
 end
 
