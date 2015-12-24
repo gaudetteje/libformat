@@ -13,6 +13,12 @@ function ts = bin_to_mat(binfile,nChan,fs)
 % Note:  NI LabVIEW data are assumed to be 64-bit (double) floating point
 %   and IEEE big-endian byte ordering
 
+% Author:   Jason Gaudette
+% Company:  Naval Undersea Warfare Center (Newport, RI)
+% Phone:    401.832.6601
+% Email:    jason.e.gaudette@navy.mil
+% Date:     20151224
+%
 
 switch nargin
     case 3
@@ -40,3 +46,6 @@ ts.data = fread(fh,[nChan Inf],'double')';
 % write data to MAT
 matfile = fullfile(pathname,[prefix '.mat']);
 save(matfile, 'ts');
+
+% close file
+fclose(fh);

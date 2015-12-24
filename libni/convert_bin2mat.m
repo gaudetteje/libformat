@@ -2,88 +2,86 @@ function convert_bin2mat(varargin)
 % CONVERT_BIN2MAT  Converts NI LabVIEW binary files to MATLAB MAT files
 %
 % convert_bin2mat - scans current directory and subdirectories for all
-%     binary LabVIEW formats and converts to MATLAB format
+%     known binary LabVIEW formats and converts to MATLAB format
 % convert_bin2mat(SRCPATH) - scans the directory, SRCPATH, for known files
-% convert_bin2mat(SRCNAME) - accepts a single filename as a string, or
+% convert_bin2mat(PATTERN) - accepts a single filename as a string, or
 %     multiple filenames as a cell array of strings
-% convert_bin2mat(SRCNAME,DSTPATH) - saves converted files to the
-%     destination directory, DSTPATH
-% convert_bin2mat(SRCNAME,DSTNAME) - saves each converted file to the
-%     filename in DSTNAME.  If a cell array of strings, DSTNAME must match
-%     the length of SRCNAME.  Relative or absolute paths may be included.
+% convert_bin2mat(SRCPATH, PATTERN) - applies both input parameters
 
+% Author:   Jason Gaudette
+% Company:  Naval Undersea Warfare Center (Newport, RI)
+% Phone:    401.832.6601
+% Email:    jason.e.gaudette@navy.mil
+% Date:     20151224
+%
 
-% default paths
+% default paths and search pattern
 src = '.';
-dst = '.';
+pattern = '\.(av)?bin$';
 
 switch nargin
     case 2
         src = varargin{1};
-        dst = varargin{2};
+        pattern = varargin{2};
     case 1
-        src = varargin{1};
-        dst = src;
+        if exist(varargin{1},'dir') || exist(varargin{1},'file')
+            src = varargin{1};
+        elseif ischar(varargin{1})
+            pattern = varargin{1};
+        else
+            error('Unknown parameter format')
+        end
     case 0
     otherwise
         error('Incorrect number of parameters entered')
 end
 
-
-% parse input parameters
-if ischar(src)
-    % if path entered, locate all files in specified path
-    if exist(src,'dir')
-        src = findfiles(src,'\.(av)?bin$');
-    % if filename entered, verify it exists
-    elseif exist(src,'file')
-        src = {src};
-    % otherwise, locate full or partial filename matches
-    else
-        [pname,fname,ext] = fileparts(src);
-        if isempty(pname); pname = '.'; end
-        if isempty(strfind(ext,'avbin')); fname = [fname ext]; end
-        src = findfiles('.',[fname '\.avbin$']);
-    end
-end
+% locate all files in specified path
+src = findfiles(src,pattern);
 
 % bail out if nothing is found
 if isempty(src)
     error('No files were found')
 end
 
-% specify a destination
-if ischar(dst)
-    if exist(dst,'dir')
-        dst = repmat({dst},numel(src),1);
-    else
-        dst = {dst};
-    end
-end
-
-assert(all(size(dst) == size(src)),'Source and destination arrays must have an equal number of elements!')
-
-
 % iterate over each file
 for f = 1:numel(src)
     srcname = src{f};
-    dstname = dst{f};
     
-    % reuse src filename if dstname is a path
-    if exist(dstname,'dir')
-        [~,prefix,~] = fileparts(srcname);
-        dstname = fullfile(dstname,prefix); % omit extension for now
-    end
-    
+    % verify file exists
     if ~exist(srcname,'file')
         warning('CONVERT_BIN2MAT:FileNotFound','Could not find source file "%s"!',srcname)
         continue
     end
-
-    dstname = [dstname '.mat'];
-    fprintf('Converting "%s" to "%s"...',srcname,dstname);
-
-    bin_to_mat(srcname,2);
-
+    
+    % determine channel count based on extension
+    [pname,fname,ext] = fileparts(srcname);
+    switch ext
+        case '.bin'
+            infofile = fullfile(pname,'ExpInfo.mat');
+            if exist(infofile,'file')
+                % try to get number of trials from info file
+                load infofile
+                if isfield(ExpInfo,'nTrials')
+                    nchan = ExpInfo.nTrials;
+                else
+                    nchan = 1;
+                end
+            else
+                % default to 1 channel
+                nchan = 1;
+            end
+        case '.avbin'
+            nchan = 2;
+        otherwise
+            warning('Unknown number of channels in data; Assuming 1 channel')
+            nchan = 1;
+    end
+    
+    % convert the data file
+    fprintf('Converting "%s"...',srcname);
+    bin_to_mat(srcname,nchan);
     fprintf('  Done!\n');
 end
+
+fprintf('\nCompleted conversion of %d files.\n\n',numel(src));
