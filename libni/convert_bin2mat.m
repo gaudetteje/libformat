@@ -44,6 +44,8 @@ if isempty(src)
     error('No files were found')
 end
 
+tic
+
 % iterate over each file
 for f = 1:numel(src)
     srcname = src{f};
@@ -64,8 +66,7 @@ for f = 1:numel(src)
                 load(infofile)
                 
                 % try to extract number of trials
-                if strcmp(fname(end-5:end),'trials') 
-                    isfield(ExpInfo,'nTrials')
+                if strcmp(fname(end-5:end),'trials') && isfield(ExpInfo,'nTrials')
                     nchan = ExpInfo.nTrials;
                 else
                     nchan = 1;
@@ -107,3 +108,5 @@ for f = 1:numel(src)
 end
 
 fprintf('\nCompleted conversion of %d files.\n\n',numel(src));
+
+toc
