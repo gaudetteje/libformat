@@ -11,10 +11,11 @@ function atfconvert(varargin)
 % Company:  Naval Undersea Warfare Center (Newport, RI)
 % Phone:    401.832.6601
 % Email:    jason.e.gaudette@navy.mil
-% Date:     20150813
+% Date:     20151226
 %
 
-tic
+% parameters
+OVERWRITE = false;
 
 % get directory to search
 if (nargin > 0)
@@ -30,15 +31,18 @@ end
 diary([wdir sprintf('atfconvert_log_%s.txt', date)]);
 disp(datestr(now))
 
+%% Search for and convert VRecord files
+
 % compile search results
-flist=findfiles(wdir, '^[^\.]*$');      % accept any file without periods
+flist=findfiles(wdir, '^v[^\.]*$');      % accept any file without an extension
 nfiles=length(flist);
+fprintf('Found %d files...\n', nfiles);
 if ~nfiles
-    error('No files found in directory "%s"', wdir);
     diary 'off';
+    warning('No VRecord files found in directory "%s"', wdir);
 end
 
-fprintf('Found %d files...\n', nfiles);
+tic
 
 for fnum=1:nfiles
     % parse string for file and path names
@@ -46,22 +50,62 @@ for fnum=1:nfiles
     fname_mat = [fname '.mat'];
     
     % verify file does not already exist
-    if 0 %exist(fname_mat, 'file')
+    if ~OVERWRITE && exist(fname_mat, 'file')
         fprintf('[%d] File already converted!  Bypassing "%s"\n', fnum, fname);
         continue;
     end
     
-    fprintf('[%d] Converting file: %s\n', fnum, fname_mat);
+    fprintf('\n[%d] Converting file: %s\n', fnum, fname_mat);
     
-    % read beam pattern time series file (ASCII formatted)
-    rec = atfReadRecord(fname);
-    
+    % read time series file (ASCII formatted)
+    rec = atfReadVRecord(fname);
+
     % save data to file
     save([fname '.mat'], 'rec')
-
+    
     % clear variables for next iteration
     clear rec
 end
 
-fprintf('Finished converting %d files in %.0f seconds (%.2f minutes).\n\n', nfiles, toc, toc/60);
+fprintf('\nFinished converting %d VRecord files in %.0f seconds (%.2f minutes).\n\n', nfiles, toc, toc/60);
+
+
+%% Search for and convert XData files
+
+% compile search results
+flist=findfiles(wdir, '^x[^\.]*$');      % accept any file without an extension
+nfiles=length(flist);
+fprintf('Found %d files...\n', nfiles);
+if ~nfiles
+    diary 'off';
+    warning('No XData files found in directory "%s"', wdir);
+end
+
+tic
+
+for fnum=1:nfiles
+    % parse string for file and path names
+    fname = flist{fnum};
+    fname_mat = [fname '.mat'];
+    
+    % verify file does not already exist
+    if ~OVERWRITE && exist(fname_mat, 'file')
+        fprintf('[%d] File already converted!  Bypassing "%s"\n', fnum, fname);
+        continue;
+    end
+    
+    fprintf('\n[%d] Converting file: %s\n', fnum, fname_mat);
+    
+    % read time series file (ASCII formatted)
+    fd = atfReadXFile(fname);
+
+    % save data to file
+    save([fname '.mat'], 'fd')
+    
+    % clear variables for next iteration
+    clear fd
+end
+
+fprintf('\nFinished converting %d XData files in %.0f seconds (%.2f minutes).\n\n', nfiles, toc, toc/60);
+
 diary off;

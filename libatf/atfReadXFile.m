@@ -1,12 +1,9 @@
 function rec = atfReadXFile(fname,varargin)
 % ATFREADXFILE  Convert ATF formatted frequency spectrum data
 
-fclose('all');   % cleanup from previous debugging
-
-fInfo = dir(fname);
 fid = fopen(fname,'r');
 if fid < 0
-    error(sprintf('Unable to open file "%s"',fname))
+    error('Unable to open file "%s"',fname)
 end
 
 % read in formatted header data
@@ -18,17 +15,25 @@ rec.fname = res{2}{1};
 
 % 2nd row - test date
 res = textscan(hdr{1}{2},'%s%s','delimiter',':');
-rec.datenumber = datenum(res{2}{1});
-rec.testdate = datestr(rec.datenumber);
+rec.datecode = datenum(res{2}{1});
+rec.testdate = datestr(rec.datecode);
 
 % 3rd row - number of frequency bins
 res = textscan(hdr{1}{3},'%s%n','delimiter',':');
 rec.freqbins = res{2};
 
-% read in raw data
-res = textscan(fid, '%f%f%f%f%f');
+% read in data labels
+res = textscan(hdr{1}{5},'%s');
+rec.labels = res{:};
+
+% read in data columns
+nCol = numel(rec.labels);
+pattern = repmat('%f',1,nCol);
+res = textscan(fid, pattern);
 rec.freq = res{1};
-rec.rvs1 = res{2};
-rec.rvs2 = res{3};
-rec.rvs3 = res{4};
-rec.rvs4 = res{5};
+for n=2:nCol
+    rec.magdb(:,n-1) = res{n};
+end
+
+% cleanup
+fclose(fid);

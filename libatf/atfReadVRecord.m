@@ -1,6 +1,4 @@
-function rec = atfReadRecord(fname,varargin)
-
-fclose('all');   % cleanup from previous debugging
+function rec = atfReadVRecord(fname,varargin)
 
 global nCh
 global nSamp
@@ -41,7 +39,8 @@ for n=1:nCh
         nSamp(4) = res{4};
         break
     else
-        error('Channels exceed 4; not sure how to parse text header')
+        warning('Channels exceed 4; Cannot parse text header!')
+        return
     end
 end
 
@@ -53,8 +52,14 @@ for n = 1:nCh
 end
 datSize = (nCh * 16) + sum(blkSize);   % count Channel header line
 
+% report record size
+fprintf('Found %d channels of size (',n);
+for n=1:nCh-1
+    fprintf('%d, ',nSamp(n));
+end
+fprintf('%d) samples\n',nSamp(nCh));
+
 %% read first record to determine header/footer sizes
-fprintf('Reading %d samples on %d channels\n',nSamp,nCh)
 
 % read in each channel data
 rec = readRecord(fid);
@@ -89,40 +94,40 @@ function rec = readRecord(fid)
 global nCh
 global nSamp
 
-    % read in each channel data
-    for n = 1:nCh
-%        res = textscan(fid, '%s', 1, 'delimiter', '\n');
-        fmt = '%n';
-        dat = textscan(fid, fmt, nSamp(n), ...
-            'HeaderLines', 1);      % just skip over "CHANNEL X DATA"
+% read in each channel data
+for n = 1:nCh
+%    res = textscan(fid, '%s', 1, 'delimiter', '\n');
+    fmt = '%n';
+    dat = textscan(fid, fmt, nSamp(n), ...
+        'HeaderLines', 1);      % just skip over "CHANNEL X DATA"
 
-        % advance to next line (textscan ignores the last carriage return)
-        fseek(fid, 2, 0);
+    % advance to next line (textscan ignores the last carriage return)
+    fseek(fid, 2, 0);
 
-        % append data to struct
-        ts(n).data = dat{1};
-    end
+    % append data to struct
+    ts(n).data = dat{1};
+end
 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % read record footer data
-    ftr = textscan(fid, '%s', 9, 'Delimiter', '\n');
-    
-    % operating frequency
-    txt = textscan(ftr{1}{1},'%s%s','delimiter',':');
-    rec.opfreq = str2double(txt{2}{1});
-    
-    % rotator angle
-    txt = textscan(ftr{1}{2},'%s%s','delimiter',':');
-    rec.angle = str2double(txt{2}{1});    
-    
-    % sampling rate (assumes all channels have equal fs)
-    txt = textscan(ftr{1}{3},'%s%s','delimiter',':');
-    [ts(:).fs] = deal(1/str2double(txt{2}{1}));
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% read record footer data
+ftr = textscan(fid, '%s', 9, 'Delimiter', '\n');
 
-    % date and timestamp
-    %res = textscan(ftr{1}{9},'%{mmm dd, yyyy hh:mm:ss}D','delimiter',':');
-    %rec(m).date = res{2}{1};    % date stamp
-    rec.date = ftr{1}{9}(21:end);
-    
-    % save data record to parent struct
-    rec.ts = ts;
+% operating frequency
+txt = textscan(ftr{1}{1},'%s%s','delimiter',':');
+rec.opfreq = str2double(txt{2}{1});
+
+% rotator angle
+txt = textscan(ftr{1}{2},'%s%s','delimiter',':');
+rec.angle = str2double(txt{2}{1});    
+
+% sampling rate (assumes all channels have equal fs)
+txt = textscan(ftr{1}{3},'%s%s','delimiter',':');
+[ts(:).fs] = deal(1/str2double(txt{2}{1}));
+
+% date and timestamp
+%res = textscan(ftr{1}{9},'%{mmm dd, yyyy hh:mm:ss}D','delimiter',':');
+%rec(m).date = res{2}{1};    % date stamp
+rec.date = ftr{1}{9}(21:end);
+
+% save data record to parent struct
+rec.ts = ts;
