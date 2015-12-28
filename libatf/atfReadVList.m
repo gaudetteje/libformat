@@ -37,7 +37,9 @@ while ~feof(fid)
         res = textscan(res{1}{1}, '%f');
         data(end+1,:) = [res{:}]';
     end
+    fprintf('Found %d samples and %d channels\n',size(data,1),rec(nRec).nChan)
     
+
     % assign data columns to record struct
     rec(nRec).(rec(nRec).xlabel) = data(:,1);
     for n=1:rec(nRec).nChan
@@ -49,6 +51,7 @@ while ~feof(fid)
     nRec = nRec + 1;
     clear data res
 end
+fprintf('Found %d total lists\n',nRec)
 
 % cleanup filespace
 fclose(fid);

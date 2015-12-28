@@ -28,6 +28,7 @@ rec.labels = res{:};
 
 % read in data columns
 nCol = numel(rec.labels);
+fprintf('Found %d channels with %d frequency bins\n',nCol,rec.freqbins)
 pattern = repmat('%f',1,nCol);
 res = textscan(fid, pattern);
 rec.freq = res{1};

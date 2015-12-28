@@ -15,7 +15,7 @@ function atfconvert(varargin)
 %
 
 % parameters
-OVERWRITE = false;
+OVERWRITE = true;
 
 % get directory to search
 if (nargin > 0)
@@ -61,11 +61,17 @@ for fnum=1:nfiles
     try
         rec = atfReadVRecord(fname);
     catch
-        rec = atfReadVList(fname);
+        try
+            rec = atfReadVList(fname);
+        catch
+            warning('Could not convert file "%s"', fname)
+        end
     end
     
     % save data to file
-    save([fname '.mat'], 'rec')
+    if exist('rec','var')
+        save([fname '.mat'], 'rec')
+    end
     
     % clear variables for next iteration
     clear rec
