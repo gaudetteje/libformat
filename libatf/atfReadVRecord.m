@@ -18,6 +18,7 @@ hdr = textscan(fid, '%s', 6, 'Delimiter', '\n');
 % 1st row - array stave
 res = textscan(hdr{1}{1},'%s%s','delimiter',':');
 model = res{2}{1};
+    
 
 % 2nd row - comments
 res = textscan(hdr{1}{2},'%s%s','delimiter',':');

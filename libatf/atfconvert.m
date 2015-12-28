@@ -31,7 +31,7 @@ end
 diary([wdir sprintf('atfconvert_log_%s.txt', date)]);
 disp(datestr(now))
 
-%% Search for and convert VRecord files
+%% Search for and convert VRecord and VList files
 
 % compile search results
 flist=findfiles(wdir, '^v[^\.]*$');      % accept any file without an extension
@@ -58,8 +58,12 @@ for fnum=1:nfiles
     fprintf('\n[%d] Converting file: %s\n', fnum, fname_mat);
     
     % read time series file (ASCII formatted)
-    rec = atfReadVRecord(fname);
-
+    try
+        rec = atfReadVRecord(fname);
+    catch
+        rec = atfReadVList(fname);
+    end
+    
     % save data to file
     save([fname '.mat'], 'rec')
     
