@@ -8,13 +8,6 @@ function convert_bin2mat(varargin)
 %     multiple filenames as a cell array of strings
 % convert_bin2mat(SRCPATH, PATTERN) - applies both input parameters
 
-% Author:   Jason Gaudette
-% Company:  Naval Undersea Warfare Center (Newport, RI)
-% Phone:    401.832.6601
-% Email:    jason.e.gaudette@navy.mil
-% Date:     20151224
-%
-
 % default paths and search pattern
 src = '.';
 pattern = '\.(av)?bin$';

@@ -1,18 +1,11 @@
 function otfconvert(varargin)
 % OTFCONVERT  This program performs a mass conversion of captured THAMES
-% data at the NUWC OTF facility to the MATLAB binary format
+% data to the MATLAB binary format
 %
 % If you don't specify the search path as a parameter, you will be prompted
 % to enter the directory which contains the files to be converted.  All
 % .BIN files and associated .DAT files will be converted to .MAT files.
 % The program will automatically traverse subdirectories.
-%
-
-% Author:   Jason Gaudette
-% Company:  Naval Undersea Warfare Center (Newport, RI)
-% Phone:    401.832.6601
-% Email:    gaudetteje@npt.nuwc.navy.mil
-% Date:     20061003
 %
 
 tic

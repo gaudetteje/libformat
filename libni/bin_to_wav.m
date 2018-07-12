@@ -7,13 +7,6 @@ function bin_to_wav(binfile,nChan,fs)
 %
 % Note:  The default number of channels is 2 and default sampling rate is 500 ksps
 
-% Author:   Jason Gaudette
-% Company:  Naval Undersea Warfare Center (Newport, RI)
-% Phone:    401.832.6601
-% Email:    jason.e.gaudette@navy.mil
-% Date:     20151224
-%
-
 switch nargin
     case 3
         ts.fs = fs;

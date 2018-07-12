@@ -7,12 +7,6 @@ function pcmconvert(varargin)
 % file must be present that points to the name of the associated .PCM file.
 %
 
-% Author:   Jason Gaudette
-% Company:  Naval Undersea Warfare Center (Newport, RI)
-% Phone:    401.832.6601
-% Email:    gaudetteje@npt.nuwc.navy.mil
-% Date:     20060825
-%
 % This script was adapted from convert_pcm.m written by Bruce Abraham,
 %   Applied Physical Sciences Corp, babraham@aphysci.com, 10 Aug 06
 

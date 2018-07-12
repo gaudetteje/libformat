@@ -1,6 +1,5 @@
-% This function will rename the files in a folder to match the proper
-% channel.
 function pcmrename(varargin)
+% This function will rename the files in a folder to match the proper channel.
 
 tic
 

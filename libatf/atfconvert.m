@@ -1,17 +1,10 @@
 function atfconvert(varargin)
 % ATFCONVERT  This program performs a mass conversion of captured
-% data at the NUWC ATF facility to the MATLAB binary format
+% data to the MATLAB binary format
 %
 % If you don't specify the search path as a parameter, you will be prompted
 % to enter the directory which contains the files to be converted.
 % The program will automatically traverse subdirectories.
-%
-
-% Author:   Jason Gaudette
-% Company:  Naval Undersea Warfare Center (Newport, RI)
-% Phone:    401.832.6601
-% Email:    jason.e.gaudette@navy.mil
-% Date:     20151226
 %
 
 % parameters

@@ -1,10 +1,4 @@
 % PCMPLOT   This script will plot time-series data converted from PCM files
-%
-% Written By:  Jason Gaudette, NUWC Newport
-% Date:  20060824
-%
-clear all;
-%close all;
 
 split=false;    % plots are split into subplots if true
 

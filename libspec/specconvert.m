@@ -6,13 +6,6 @@ function specconvert(varargin)
 % program will automatically traverse subdirectories.
 %
 
-% Author:   Jason Gaudette
-% Company:  Naval Undersea Warfare Center (Newport, RI)
-% Phone:    401.832.6601
-% Email:    gaudetteje@npt.nuwc.navy.mil
-% Date:     20070816
-%
-
 tic
 
 % get directory to search

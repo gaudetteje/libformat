@@ -8,13 +8,6 @@ function apconvert(varargin)
 % traverse subdirectories.
 %
 
-% Author:   Jason Gaudette
-% Company:  Naval Undersea Warfare Center (Newport, RI)
-% Phone:    401.832.6601
-% Email:    gaudetteje@npt.nuwc.navy.mil
-% Date:     20061204
-%
-
 tic
 
 % get directory to search

@@ -1,5 +1,5 @@
 function rec = atfReadVList(fname,varargin)
-% ATFREADVLIST  Reads ATF data formatted into multiple columnar sectinos of ASCII data
+% ATFREADVLIST  Reads ATF data formatted into multiple columnar sections of ASCII data
 %
 
 fid = fopen(fname,'r');
