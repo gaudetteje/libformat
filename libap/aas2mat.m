@@ -1,21 +1,15 @@
-function aas2dream(varargin)
-% AAS2DREAM  This function converts raw stereo waveforms from the AP2722
-% into MATLAB format readable by John Laliberte's DREAM GUI
+function aas2mat(varargin)
+% AAS2MAT  This function converts raw stereo waveforms from the AP2722
+% into MATLAB binary format
 %
-% AAS2DREAM()  prompts user for directory to search
-% AAS2DREAM(WDIR)  searches WDIR for AP2722 generated AAS files
-% AAS2DREAM(WDIR,FNORM)  normalizes the sampling rate by FNORM
+% AAS2MAT()  prompts user for directory to search
+% AAS2MAT(WDIR)  searches WDIR for AP2722 generated AAS files
+% AAS2MAT(WDIR,FNORM)  normalizes the sampling rate by FNORM
 %
 % All .AAS files will be converted to .MAT files.  Data will be stored in
 % the structure 'CH' and all other relevant information in 'hdr'.  The
 % program will automatically traverse subdirectories.
 %
-
-% Author:   Jason Gaudette
-% Company:  Naval Undersea Warfare Center (Newport, RI)
-% Phone:    401.832.6601
-% Email:    gaudetteje@npt.nuwc.navy.mil
-% Date:     20080219
 
 tic
 
